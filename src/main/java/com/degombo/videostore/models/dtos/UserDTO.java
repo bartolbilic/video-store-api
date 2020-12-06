@@ -1,11 +1,15 @@
 package com.degombo.videostore.models.dtos;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class UserDTO {
     private final String username;
-    private final String password;
+    private String password;
     private final String firstName;
     private final String lastName;
 }
