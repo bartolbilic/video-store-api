@@ -7,6 +7,7 @@ import com.degombo.videostore.repositories.MovieRepository;
 import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -47,7 +48,9 @@ public class MovieService {
     }
 
     public void deleteById(Long id) {
-        movieRepository.deleteById(id);
+        Movie movie = movieRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        movieRepository.deleteById(movie.getId());
     }
 
     public Movie convert(MovieDTO movieDTO) {
@@ -58,5 +61,17 @@ public class MovieService {
         Movie movie = modelMapper.map(movieDTO, Movie.class);
         movie.setGenres(genres);
         return movie;
+    }
+
+    public ResponseEntity<Void> updateById(Long id, MovieDTO movieDTO) {
+        Movie movie = convert(movieDTO);
+        movie.setId(id);
+        if (movieRepository.existsById(id)) {
+            movieRepository.save(movie);
+            return ResponseEntity.status(200).build();
+        }
+
+        movieRepository.save(movie);
+        return ResponseEntity.status(201).build();
     }
 }

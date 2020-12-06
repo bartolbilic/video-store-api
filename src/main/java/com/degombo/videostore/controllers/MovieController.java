@@ -4,6 +4,7 @@ import com.degombo.videostore.models.dtos.MovieDTO;
 import com.degombo.videostore.models.entities.Movie;
 import com.degombo.videostore.services.MovieService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,5 +44,11 @@ public class MovieController {
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable("id") Long id) {
         movieService.deleteById(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateById(@PathVariable("id") Long id,
+                                           @RequestBody MovieDTO movieDTO) {
+        return movieService.updateById(id, movieDTO);
     }
 }
