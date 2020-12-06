@@ -4,9 +4,9 @@ import com.degombo.videostore.models.dtos.UserDTO;
 import com.degombo.videostore.models.entities.User;
 import com.degombo.videostore.models.projections.UserProjection;
 import com.degombo.videostore.repositories.UserRepository;
-import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,5 +46,16 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         return userRepository.findByUsername(s)
                 .orElseThrow(() -> new UsernameNotFoundException("Username " + s + " not found"));
+    }
+
+    public void deleteAll() {
+        userRepository.deleteAll();
+    }
+
+    public void deleteById(Long id) {
+        userRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        userRepository.deleteById(id);
     }
 }

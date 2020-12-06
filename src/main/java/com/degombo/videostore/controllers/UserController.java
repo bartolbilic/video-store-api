@@ -7,6 +7,7 @@ import com.degombo.videostore.models.projections.UserProjection;
 import com.degombo.videostore.services.UserService;
 import com.degombo.videostore.utils.JwtTokenUtil;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,6 +57,16 @@ public class UserController {
     public void save(@RequestBody UserDTO userDTO) {
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userService.save(userDTO);
+    }
+
+    @DeleteMapping
+    public void deleteAll() {
+        userService.deleteAll();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable("id") Long id) {
+        userService.deleteById(id);
     }
 
     private void authenticate(String username, String password) {
