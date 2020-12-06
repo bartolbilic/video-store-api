@@ -2,6 +2,7 @@ package com.degombo.videostore.services;
 
 import com.degombo.videostore.models.dtos.UserDTO;
 import com.degombo.videostore.models.entities.User;
+import com.degombo.videostore.models.projections.UserProjection;
 import com.degombo.videostore.repositories.UserRepository;
 import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
@@ -24,8 +25,8 @@ public class UserService implements UserDetailsService {
         this.modelMapper = modelMapper;
     }
 
-    public List<User> findAll() {
-        return Lists.newArrayList(userRepository.findAll());
+    public List<UserProjection> findAll() {
+        return userRepository.findAllProjected();
     }
 
     public User findById(Long id) {

@@ -4,6 +4,7 @@ import com.degombo.videostore.models.dtos.AuthRequest;
 import com.degombo.videostore.models.dtos.JwtDTO;
 import com.degombo.videostore.models.dtos.UserDTO;
 import com.degombo.videostore.models.entities.User;
+import com.degombo.videostore.models.projections.UserProjection;
 import com.degombo.videostore.services.UserService;
 import com.degombo.videostore.utils.JwtTokenUtil;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> findAll() {
+    public List<UserProjection> findAll() {
         return userService.findAll();
     }
 
