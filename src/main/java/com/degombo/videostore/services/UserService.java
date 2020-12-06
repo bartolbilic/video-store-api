@@ -29,8 +29,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllProjected();
     }
 
-    public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() ->
+    public UserProjection findById(Long id) {
+        return userRepository.findByIdProjected(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 

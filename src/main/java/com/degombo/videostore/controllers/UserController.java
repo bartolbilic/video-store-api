@@ -3,7 +3,6 @@ package com.degombo.videostore.controllers;
 import com.degombo.videostore.models.dtos.AuthRequest;
 import com.degombo.videostore.models.dtos.JwtDTO;
 import com.degombo.videostore.models.dtos.UserDTO;
-import com.degombo.videostore.models.entities.User;
 import com.degombo.videostore.models.projections.UserProjection;
 import com.degombo.videostore.services.UserService;
 import com.degombo.videostore.utils.JwtTokenUtil;
@@ -38,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable("id") Long id) {
+    public UserProjection findById(@PathVariable("id") Long id) {
         return userService.findById(id);
     }
 
