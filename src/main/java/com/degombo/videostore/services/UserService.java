@@ -6,19 +6,22 @@ import com.degombo.videostore.repositories.UserRepository;
 import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final ModelMapper modelMappper;
+    private final ModelMapper modelMapper;
 
-    public UserService(UserRepository userRepository, ModelMapper modelMappper) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
-        this.modelMappper = modelMappper;
+        this.modelMapper = modelMapper;
     }
 
     public List<User> findAll() {
@@ -35,6 +38,12 @@ public class UserService {
     }
 
     public User convert(UserDTO userDTO) {
-        return modelMappper.map(userDTO, User.class);
+        return modelMapper.map(userDTO, User.class);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        return userRepository.findByUsername(s)
+                .orElseThrow(() -> new UsernameNotFoundException("Username " + s + " not found"));
     }
 }

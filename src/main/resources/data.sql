@@ -13,4 +13,7 @@ INSERT INTO movie_genres(movies_id, genres_id) VALUES (2, 1);
 INSERT INTO movie_genres(movies_id, genres_id) VALUES (2, 3);
 INSERT INTO movie_genres(movies_id, genres_id) VALUES (2, 4);
 
+INSERT INTO user(id, username, password, first_name, last_name)
+VALUES (1, 'bartol', '$2y$12$hwLkioHHit2qkvU6IRtWI.8Z/nV6ffStI47Wy5y5Zg0xJhfaBHDgu', 'Bartol', 'Bilic');
+
 
