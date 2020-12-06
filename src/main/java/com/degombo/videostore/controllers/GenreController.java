@@ -44,4 +44,10 @@ public class GenreController {
     public void deleteById(@PathVariable("id") Long id) {
         genreService.deleteById(id);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateById(@PathVariable("id") Long id,
+                                           @RequestBody GenreDTO genreDTO) {
+        return genreService.updateById(id, genreDTO);
+    }
 }

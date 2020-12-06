@@ -2,7 +2,6 @@ package com.degombo.videostore.services;
 
 import com.degombo.videostore.models.dtos.GenreDTO;
 import com.degombo.videostore.models.entities.Genre;
-import com.degombo.videostore.models.entities.Movie;
 import com.degombo.videostore.repositories.GenreRepository;
 import com.degombo.videostore.repositories.MovieRepository;
 import com.google.common.collect.Lists;
@@ -76,5 +75,17 @@ public class GenreService {
         }
 
         return genres.get(0);
+    }
+
+    public ResponseEntity<Void> updateById(Long id, GenreDTO genreDTO) {
+        Genre genre = convert(genreDTO);
+        genre.setId(id);
+        if (genreRepository.existsById(id)) {
+            genreRepository.save(genre);
+            return ResponseEntity.status(200).build();
+        }
+
+        genreRepository.save(genre);
+        return ResponseEntity.status(201).build();
     }
 }
