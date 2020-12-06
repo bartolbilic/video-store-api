@@ -17,6 +17,9 @@ public class Movie {
     private String title;
     private String description;
 
+    @ManyToMany(mappedBy = "movies")
+    private Set<User> users;
+
     @ManyToMany(cascade = CascadeType.PERSIST)
     private Set<Genre> genres;
 }

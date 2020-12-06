@@ -1,12 +1,12 @@
 package com.degombo.videostore.services;
 
 import com.degombo.videostore.models.dtos.UserDTO;
+import com.degombo.videostore.models.entities.Movie;
 import com.degombo.videostore.models.entities.User;
 import com.degombo.videostore.models.projections.UserProjection;
 import com.degombo.videostore.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,8 +29,13 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllProjected();
     }
 
-    public UserProjection findById(Long id) {
+    public UserProjection findByIdProjected(Long id) {
         return userRepository.findByIdProjected(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -57,5 +62,11 @@ public class UserService implements UserDetailsService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         userRepository.deleteById(id);
+    }
+
+    public void addMovie(Long userId, Movie movie) {
+        User user = findById(userId);
+        user.getMovies().add(movie);
+        userRepository.save(user);
     }
 }

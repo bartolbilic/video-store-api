@@ -1,8 +1,10 @@
 package com.degombo.videostore.services;
 
 import com.degombo.videostore.models.dtos.MovieDTO;
+import com.degombo.videostore.models.dtos.UserDTO;
 import com.degombo.videostore.models.entities.Genre;
 import com.degombo.videostore.models.entities.Movie;
+import com.degombo.videostore.models.entities.User;
 import com.degombo.videostore.repositories.MovieRepository;
 import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
@@ -73,5 +75,9 @@ public class MovieService {
 
         movieRepository.save(movie);
         return ResponseEntity.status(201).build();
+    }
+
+    public List<Movie> findAllByUsersContaining(User user) {
+        return movieRepository.findAllByUsersIsContaining(user);
     }
 }
