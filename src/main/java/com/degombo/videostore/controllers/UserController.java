@@ -1,11 +1,10 @@
 package com.degombo.videostore.controllers;
 
+import com.degombo.videostore.models.dtos.UserDTO;
 import com.degombo.videostore.models.entities.User;
 import com.degombo.videostore.services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +25,11 @@ public class UserController {
     @GetMapping("/{id}")
     public User findById(@PathVariable("id") Long id) {
         return userService.findById(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public void save(@RequestBody UserDTO userDTO) {
+        userService.save(userDTO);
     }
 }
