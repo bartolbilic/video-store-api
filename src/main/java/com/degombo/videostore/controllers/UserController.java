@@ -1,6 +1,9 @@
 package com.degombo.videostore.controllers;
 
-import com.degombo.videostore.models.dtos.*;
+import com.degombo.videostore.models.dtos.AuthRequest;
+import com.degombo.videostore.models.dtos.IdDTO;
+import com.degombo.videostore.models.dtos.JwtDTO;
+import com.degombo.videostore.models.dtos.UserDTO;
 import com.degombo.videostore.models.entities.Movie;
 import com.degombo.videostore.models.entities.User;
 import com.degombo.videostore.models.projections.UserProjection;
@@ -8,15 +11,14 @@ import com.degombo.videostore.services.MovieService;
 import com.degombo.videostore.services.UserService;
 import com.degombo.videostore.utils.JwtTokenUtil;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -74,6 +76,12 @@ public class UserController {
         userService.deleteById(id);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateById(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) {
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        return userService.updateById(id, userDTO);
+    }
+
     @GetMapping("/{id}/movies")
     public List<Movie> getMovies(@PathVariable("id") Long id) {
         User user = userService.findById(id);
@@ -83,6 +91,11 @@ public class UserController {
     @PostMapping("/{id}/movies")
     public void addMovie(@PathVariable("id") Long userId, @RequestBody IdDTO movieDTO) {
         userService.addMovie(userId, movieService.findById(movieDTO.getId()));
+    }
+
+    @DeleteMapping("/{id}/movies")
+    public void deleteAllMovies(@PathVariable("id") Long id) {
+        userService.deleteAllMovies(userService.findById(id));
     }
 
     private void authenticate(String username, String password) {

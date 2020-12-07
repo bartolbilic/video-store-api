@@ -1,5 +1,6 @@
 package com.degombo.videostore.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ public class Movie {
     private String description;
 
     @ManyToMany(mappedBy = "movies")
+    @JsonIgnore
     private Set<User> users;
 
     @ManyToMany(cascade = CascadeType.PERSIST)

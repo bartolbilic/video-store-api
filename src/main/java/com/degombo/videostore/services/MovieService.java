@@ -1,11 +1,11 @@
 package com.degombo.videostore.services;
 
 import com.degombo.videostore.models.dtos.MovieDTO;
-import com.degombo.videostore.models.dtos.UserDTO;
 import com.degombo.videostore.models.entities.Genre;
 import com.degombo.videostore.models.entities.Movie;
 import com.degombo.videostore.models.entities.User;
 import com.degombo.videostore.repositories.MovieRepository;
+import com.degombo.videostore.repositories.UserRepository;
 import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -23,12 +23,14 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final ModelMapper modelMapper;
     private final GenreService genreService;
+    private final UserRepository userRepository;
 
     public MovieService(MovieRepository movieRepository, GenreService genreService,
-                        ModelMapper modelMapper) {
+                        ModelMapper modelMapper, UserRepository userRepository) {
         this.movieRepository = movieRepository;
         this.modelMapper = modelMapper;
         this.genreService = genreService;
+        this.userRepository = userRepository;
     }
 
     public List<Movie> findAll(Optional<String> title) {
@@ -46,13 +48,19 @@ public class MovieService {
     }
 
     public void deleteAll() {
-        movieRepository.deleteAll();
+        movieRepository.findAll().forEach(t -> deleteById(t.getId()));
     }
 
     public void deleteById(Long id) {
         Movie movie = movieRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
-        movieRepository.deleteById(movie.getId());
+
+        movie.getUsers().forEach(t -> {
+            Set<Movie> movies = t.getMovies();
+            movies.remove(movie);
+            userRepository.save(t);
+        });
+        movieRepository.deleteById(id);
     }
 
     public Movie convert(MovieDTO movieDTO) {
