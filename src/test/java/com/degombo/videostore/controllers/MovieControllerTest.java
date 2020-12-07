@@ -143,7 +143,7 @@ class MovieControllerTest {
         Assertions.assertEquals("Home Alone", movie.getTitle());
     }
 
- @Test
+    @Test
     public void updateNonExisting() throws Exception {
         String jwtToken = getFreshJWT();
 
@@ -158,26 +158,26 @@ class MovieControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(201));
 
-     ResultActions resultActions = findById(jwtToken, 3L);
-     Movie fromDB = gson.fromJson(resultActions.andReturn().getResponse().getContentAsString(), Movie.class);
-     Assertions.assertEquals("Split", fromDB.getTitle());
+        ResultActions resultActions = findById(jwtToken, 3L);
+        Movie fromDB = gson.fromJson(resultActions.andReturn().getResponse().getContentAsString(), Movie.class);
+        Assertions.assertEquals("Split", fromDB.getTitle());
     }
 
-    /*@Test
+    @Test
     public void deleteById() throws Exception {
         String jwtToken = getFreshJWT();
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/genres/8")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/movies/4")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
         Assertions.assertFalse(findAll(jwtToken).stream()
-                .map(Genre::getName)
-                .collect(Collectors.toList()).contains("FAMILY"));
+                .map(Movie::getTitle)
+                .collect(Collectors.toList()).contains("Home Alone"));
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/genres/64")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/movies/64")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -188,25 +188,25 @@ class MovieControllerTest {
     public void deleteAll() throws Exception {
         String jwtToken = getFreshJWT();
 
-        Genre genre = new Genre();
-        genre.setName("SCIENCE FICTION");
+        Movie movie = new Movie();
+        movie.setTitle("Home Alone");
 
-        List<Genre> genres = findAll(jwtToken);
+        List<Movie> movies = findAll(jwtToken);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/genres")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/movies")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
         Assertions.assertEquals(Lists.emptyList(), findAll(jwtToken));
-        genres.forEach(t -> {
+        movies.forEach(t -> {
             try {
-                save(jwtToken, t);
+                save(jwtToken, new MovieDTO(t.getTitle(), t.getDescription(), Collections.emptyList()));
             } catch (Exception ignored) {
             }
         });
-    }*/
+    }
 
 
 }
