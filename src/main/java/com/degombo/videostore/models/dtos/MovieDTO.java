@@ -1,12 +1,18 @@
 package com.degombo.videostore.models.dtos;
 
-import lombok.Data;
+import lombok.*;
 
-import java.util.Set;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class MovieDTO {
     private String title;
     private String description;
-    private Set<GenreDTO> genres;
+    @NotNull
+    private List<GenreDTO> genres;
 }
