@@ -95,7 +95,7 @@ class GenreControllerTest {
     public void save() throws Exception {
         String jwtToken = getFreshJWT();
         Genre genre = new Genre();
-        genre.setName("HORROR");
+        genre.setName("FANTASY");
 
         save(jwtToken, genre);
         Assertions.assertTrue(findAll(jwtToken).stream().
@@ -145,6 +145,9 @@ class GenreControllerTest {
     public void deleteById() throws Exception {
         String jwtToken = getFreshJWT();
 
+        ResultActions found = findById(jwtToken, 8L);
+        Genre genre = gson.fromJson(found.andReturn().getResponse().getContentAsString(), Genre.class);
+
         mockMvc.perform(MockMvcRequestBuilders.delete("/genres/8")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -153,7 +156,7 @@ class GenreControllerTest {
 
         Assertions.assertFalse(findAll(jwtToken).stream()
                 .map(Genre::getName)
-                .collect(Collectors.toList()).contains("FAMILY"));
+                .collect(Collectors.toList()).contains(genre.getName()));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/genres/64")
                 .header("Authorization", "Bearer " + jwtToken)
