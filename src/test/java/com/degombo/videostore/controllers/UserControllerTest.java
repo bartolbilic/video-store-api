@@ -1,31 +1,30 @@
 package com.degombo.videostore.controllers;
 
 import com.degombo.videostore.models.dtos.AuthRequest;
-import com.degombo.videostore.models.dtos.GenreDTO;
 import com.degombo.videostore.models.dtos.JwtDTO;
-import com.degombo.videostore.models.dtos.MovieDTO;
-import com.degombo.videostore.models.entities.Movie;
+import com.degombo.videostore.models.dtos.UserDTO;
 import com.google.gson.Gson;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.event.annotation.AfterTestExecution;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class MovieControllerTest {
+class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -44,24 +43,24 @@ class MovieControllerTest {
         return gson.fromJson(s, JwtDTO.class).getToken();
     }
 
-    private List<Movie> findAll(String jwtToken) throws Exception {
+    private List<UserDTO> findAll(String jwtToken) throws Exception {
         String response = mockMvc.perform(MockMvcRequestBuilders
-                .get("/movies")
+                .get("/users")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200))
                 .andReturn().getResponse().getContentAsString();
 
-        return gson.fromJson(response, new TypeToken<List<Movie>>() {
+        return gson.fromJson(response, new TypeToken<List<UserDTO>>() {
         }.getType());
     }
 
-    private void save(String jwtToken, MovieDTO movie) throws Exception {
+    private void save(String jwtToken, UserDTO user) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                .post("/movies")
+                .post("/users")
                 .header("Authorization", "Bearer " + jwtToken)
-                .content(gson.toJson(movie))
+                .content(gson.toJson(user))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(201));
@@ -69,7 +68,7 @@ class MovieControllerTest {
 
     private ResultActions findById(String jwtToken, Long id) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders
-                .get("/movies/" + id)
+                .get("/users/" + id)
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
@@ -94,19 +93,16 @@ class MovieControllerTest {
     @Test
     public void save() throws Exception {
         String jwtToken = getFreshJWT();
-        MovieDTO movieDTO = new MovieDTO();
-        movieDTO.setTitle("It");
-        movieDTO.setDescription("Scary movie");
-        movieDTO.setGenres(Lists.newArrayList("HORROR")
-                .stream()
-                .map(GenreDTO::new)
-                .collect(Collectors.toList()));
-
-        save(jwtToken, movieDTO);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFirstName("Mike");
+        userDTO.setLastName("Tyson");
+        userDTO.setUsername("mike");
+        userDTO.setPassword("mike");
+        save(jwtToken, userDTO);
 
         boolean result = findAll(jwtToken).stream()
-                .map(Movie::getTitle)
-                .collect(Collectors.toList()).contains(movieDTO.getTitle());
+                .map(UserDTO::getUsername)
+                .collect(Collectors.toList()).contains(userDTO.getUsername());
 
         Assertions.assertTrue(result);
     }
@@ -116,66 +112,76 @@ class MovieControllerTest {
         String jwtToken = getFreshJWT();
 
         ResultActions result = findById(jwtToken, 1L);
-        Movie movie = gson.fromJson(result.andReturn().getResponse()
-                .getContentAsString(), Movie.class);
-        Assertions.assertEquals("Home Alone", movie.getTitle());
+        UserDTO user = gson.fromJson(result.andReturn().getResponse()
+                .getContentAsString(), UserDTO.class);
+        Assertions.assertEquals("Bartol", user.getFirstName());
 
-        movie.setTitle("Cat in the Hat");
+        user.setFirstName("Peach");
+        user.setLastName("Apple");
+        user.setUsername("bartol");
+        user.setPassword("strongPass");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/movies/1")
-                .content(gson.toJson(movie))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                .content(gson.toJson(user))
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
-        Assertions.assertEquals("Cat in the Hat", movie.getTitle());
+        Assertions.assertEquals("Peach",
+                user.getFirstName());
 
-        movie.setTitle("Home Alone");
+        user.setFirstName("Bartol");
+        user.setLastName("Bilic");
+        user.setUsername("bartol");
+        user.setPassword("bartol");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/movies/1")
-                .content(gson.toJson(movie))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                .content(gson.toJson(user))
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
-        Assertions.assertEquals("Home Alone", movie.getTitle());
+        Assertions.assertEquals("Bartol",
+                user.getFirstName());
     }
 
     @Test
     public void updateNonExisting() throws Exception {
         String jwtToken = getFreshJWT();
 
-        Movie movie = new Movie();
-        movie.setTitle("Split");
-        movie.setGenres(Collections.emptySet());
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFirstName("Mike");
+        userDTO.setLastName("Myers");
+        userDTO.setUsername("mike");
+        userDTO.setPassword("mike");
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/movies/50")
-                .content(gson.toJson(movie))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/50")
+                .content(gson.toJson(userDTO))
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(201));
 
-        ResultActions resultActions = findById(jwtToken, 3L);
-        Movie fromDB = gson.fromJson(resultActions.andReturn().getResponse().getContentAsString(), Movie.class);
-        Assertions.assertEquals("Split", fromDB.getTitle());
+        ResultActions resultActions = findById(jwtToken, 2L);
+        UserDTO fromDB = gson.fromJson(resultActions.andReturn().getResponse().getContentAsString(), UserDTO.class);
+        Assertions.assertEquals("Mike", fromDB.getFirstName());
     }
 
     @Test
     public void deleteById() throws Exception {
         String jwtToken = getFreshJWT();
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/movies/4")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/3")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
         Assertions.assertFalse(findAll(jwtToken).stream()
-                .map(Movie::getTitle)
-                .collect(Collectors.toList()).contains("Home Alone"));
+                .map(UserDTO::getLastName)
+                .collect(Collectors.toList()).contains("Tyson"));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/movies/64")
                 .header("Authorization", "Bearer " + jwtToken)
@@ -185,26 +191,16 @@ class MovieControllerTest {
     }
 
     @Test
+    @Disabled
     public void deleteAll() throws Exception {
         String jwtToken = getFreshJWT();
 
-        Movie movie = new Movie();
-        movie.setTitle("Home Alone");
-
-        List<Movie> movies = findAll(jwtToken);
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/movies")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users")
                 .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is(200));
 
         Assertions.assertEquals(Lists.emptyList(), findAll(jwtToken));
-        movies.forEach(t -> {
-            try {
-                save(jwtToken, new MovieDTO(t.getTitle(), t.getDescription(), Collections.emptyList()));
-            } catch (Exception ignored) {
-            }
-        });
     }
 }
